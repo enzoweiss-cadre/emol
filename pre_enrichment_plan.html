@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eMolecules Pre-Enrichment Plan</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f4f6f9;
+      color: #1a1a2e;
+      padding: 40px 20px;
+    }
+
+    .page { max-width: 1100px; margin: 0 auto; }
+
+    /* Header */
+    .header {
+      background: #0f2744;
+      color: white;
+      padding: 40px 48px;
+      border-radius: 12px;
+      margin-bottom: 32px;
+    }
+    .header .label {
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.6;
+      margin-bottom: 10px;
+    }
+    .header h1 { font-size: 36px; font-weight: 700; margin-bottom: 8px; }
+    .header .subtitle { font-size: 16px; opacity: 0.75; }
+    .header .meta { margin-top: 20px; font-size: 12px; opacity: 0.5; letter-spacing: 1px; }
+
+    /* Stats bar */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px 24px;
+      border-left: 4px solid #0f2744;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    }
+    .stat-card .val { font-size: 28px; font-weight: 700; color: #0f2744; }
+    .stat-card .lbl { font-size: 12px; color: #666; margin-top: 4px; }
+    .stat-card.green { border-left-color: #1a7a4a; }
+    .stat-card.green .val { color: #1a7a4a; }
+    .stat-card.orange { border-left-color: #c17200; }
+    .stat-card.orange .val { color: #c17200; }
+    .stat-card.red { border-left-color: #b03020; }
+    .stat-card.red .val { color: #b03020; }
+
+    /* Section */
+    .section {
+      background: white;
+      border-radius: 12px;
+      padding: 32px 36px;
+      margin-bottom: 28px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #eee;
+    }
+    .section-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+    .section h2 { font-size: 20px; font-weight: 700; }
+    .section-meta { margin-left: auto; font-size: 12px; color: #888; }
+
+    /* About box */
+    .about-box {
+      background: #f0f4f9;
+      border-radius: 8px;
+      padding: 20px 24px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #444;
+      margin-bottom: 28px;
+    }
+    .about-box strong { color: #0f2744; }
+
+    /* Phase header banner */
+    .phase-banner {
+      border-radius: 10px;
+      padding: 18px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .phase-banner .phase-num {
+      font-size: 36px;
+      font-weight: 800;
+      opacity: 0.9;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .phase-banner .phase-title { font-size: 18px; font-weight: 700; }
+    .phase-banner .phase-sub   { font-size: 13px; margin-top: 3px; opacity: 0.85; }
+    .phase-banner .phase-cost  {
+      margin-left: auto;
+      font-size: 22px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .phase-banner .phase-cost-label { font-size: 11px; text-align: right; opacity: 0.7; }
+
+    .phase-1 { background: #e8f5ec; color: #1a4a2e; }
+    .phase-2 { background: #ede8f5; color: #2e1a4a; }
+    .phase-3 { background: #fff3e0; color: #4a2e00; }
+
+    /* Category colors */
+    .cat-sm { background: #1a7a4a; }
+    .cat-sf { background: #1565c0; }
+    .cat-cq { background: #6a1b9a; }
+    .cat-si { background: #c17200; }
+
+    /* Field table */
+    .field-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .field-table thead tr { background: #f0f4f9; }
+    .field-table thead th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #555;
+    }
+    .field-table tbody tr { border-bottom: 1px solid #f0f0f0; }
+    .field-table tbody tr:hover { background: #fafbfc; }
+    .field-table td { padding: 14px; vertical-align: top; }
+    .field-name { font-family: 'Courier New', monospace; font-size: 13px; font-weight: 600; color: #0f2744; }
+    .field-desc { font-size: 13px; color: #555; margin-top: 2px; }
+
+    /* Fill rate badges */
+    .fill-badge { display: inline-block; padding: 3px 9px; border-radius: 12px; font-size: 12px; font-weight: 700; }
+    .fill-blind  { background: #fde8e8; color: #b03020; }
+    .fill-weak   { background: #fdf0e0; color: #c17200; }
+    .fill-mod    { background: #e8f4e8; color: #1a7a4a; }
+    .fill-strong { background: #e0eeff; color: #1565c0; }
+
+    /* Source pill */
+    .source-pill {
+      display: inline-block;
+      background: #eef2f7;
+      color: #333;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    /* API code blocks */
+    .api-block {
+      background: #1e2a3a;
+      color: #e0e8f0;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: 'Courier New', monospace;
+      font-size: 11.5px;
+      line-height: 1.6;
+      margin-top: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .api-block .comment { color: #6a8fa8; }
+    .api-block .url     { color: #7ec8e3; }
+    .api-block .param   { color: #f0c080; }
+    .api-block .val     { color: #a0e0a0; }
+
+    /* Meta tags */
+    .meta-row { display: flex; gap: 12px; margin-top: 6px; flex-wrap: wrap; }
+    .meta-tag { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+    .tag-free    { background: #d4edda; color: #155724; }
+    .tag-rate    { background: #e2e3f0; color: #383d7a; }
+    .tag-auth    { background: #fff3cd; color: #856404; }
+    .tag-paid    { background: #fde8e8; color: #7a1a1a; }
+
+    /* Expected output box */
+    .expected {
+      background: #f9fbff;
+      border: 1px solid #dce8f7;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 12.5px;
+      color: #333;
+      margin-top: 8px;
+      line-height: 1.6;
+    }
+    .expected strong { color: #0f2744; }
+
+    /* Pipeline diagram */
+    .pipeline { display: flex; align-items: center; gap: 0; margin: 24px 0; flex-wrap: wrap; }
+    .pipe-step {
+      background: #0f2744;
+      color: white;
+      padding: 16px 22px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+      min-width: 140px;
+    }
+    .pipe-step .num { font-size: 20px; font-weight: 800; display: block; margin-bottom: 4px; }
+    .pipe-arrow { font-size: 22px; color: #999; padding: 0 10px; }
+    .pipe-step.green { background: #1a7a4a; }
+    .pipe-step.blue  { background: #1565c0; }
+    .pipe-step.gold  { background: #c17200; }
+
+    /* Verticals grid */
+    .verticals-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 8px;
+    }
+    .vertical-card {
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .vertical-card-header {
+      padding: 14px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .vertical-card-body {
+      padding: 14px 18px;
+      background: #fafbfc;
+    }
+    .vertical-card-body ul {
+      list-style: none;
+      padding: 0;
+    }
+    .vertical-card-body ul li {
+      font-size: 13px;
+      color: #444;
+      padding: 4px 0;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .vertical-card-body ul li:last-child { border-bottom: none; }
+    .vertical-card-body ul li::before {
+      content: "→";
+      color: #aaa;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .vc-biotech  { background: #e8f5ec; }
+    .vc-pharma   { background: #e0eeff; }
+    .vc-ai       { background: #f0e8ff; }
+    .vc-cro      { background: #fff3e0; }
+
+    /* DQ card */
+    .dq-card {
+      background: #fdf4e0;
+      border: 1px solid #f0d080;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 13px;
+      color: #5a3e00;
+      margin-top: 16px;
+    }
+    .dq-card strong { color: #3a2600; }
+    .dq-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .dq-item {
+      background: white;
+      border: 1px solid #e8c040;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #5a3e00;
+    }
+
+    /* Roadmap table */
+    .roadmap-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px; }
+    .roadmap-table th {
+      background: #0f2744;
+      color: white;
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+    .roadmap-table td { padding: 13px 16px; border-bottom: 1px solid #eee; vertical-align: top; }
+    .roadmap-table tr:hover td { background: #fafbfc; }
+    .roadmap-table .ph1 { border-left: 4px solid #1a7a4a; }
+    .roadmap-table .ph2 { border-left: 4px solid #6a1b9a; }
+    .roadmap-table .ph3 { border-left: 4px solid #c17200; }
+
+    /* Phase badge */
+    .ph-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .ph-badge.ph1 { background: #e8f5ec; color: #1a4a2e; }
+    .ph-badge.ph2 { background: #ede8f5; color: #2e1a4a; }
+    .ph-badge.ph3 { background: #fff3e0; color: #4a2e00; }
+
+    /* Cost summary */
+    .cost-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px; }
+    .cost-card { border: 1px solid #e0e0e0; border-radius: 8px; padding: 18px 20px; }
+    .cost-card .cost-label { font-size: 12px; color: #888; margin-bottom: 6px; }
+    .cost-card .cost-val   { font-size: 22px; font-weight: 700; color: #0f2744; }
+    .cost-card .cost-note  { font-size: 11px; color: #aaa; margin-top: 4px; }
+
+    /* Scoring weight table */
+    .weight-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px; }
+    .weight-table th {
+      background: #f0f4f9;
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #555;
+    }
+    .weight-table td { padding: 12px 14px; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
+    .progress-bar { height: 8px; border-radius: 4px; background: #eee; overflow: hidden; margin-top: 4px; width: 100%; }
+    .progress-fill { height: 100%; border-radius: 4px; }
+
+    footer {
+      text-align: center;
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 40px;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- HEADER                                                   -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="header">
+    <div class="label">eMolecules ICP Scoring</div>
+    <h1>Pre-Enrichment Layer — Full Roadmap</h1>
+    <div class="subtitle">3-Phase Plan to Replace LLM Inference with Deterministic Data Sources</div>
+    <div class="meta">Generated April 13, 2026 &bull; Based on Fill Rate Report (April 09, 2026) &bull; Confidential</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- STATS BAR                                               -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="stats-bar">
+    <div class="stat-card red">
+      <div class="val">14 / 17</div>
+      <div class="lbl">Fields currently BLIND</div>
+    </div>
+    <div class="stat-card green">
+      <div class="val">11</div>
+      <div class="lbl">Fields addressable in Phase 1 (free)</div>
+    </div>
+    <div class="stat-card orange">
+      <div class="val">3</div>
+      <div class="lbl">Fields addressable in Phases 2–3 (paid)</div>
+    </div>
+    <div class="stat-card">
+      <div class="val">$78/mo</div>
+      <div class="lbl">Total cost at full rollout (Phases 1–3)</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- ABOUT                                                    -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="about-box">
+      <strong>Problem:</strong> The hybrid ICP pipeline asks LLMs (Perplexity Sonar) to find structured facts cold — company size, public status, patent counts, publication history. The fill rate report showed this fails 85%+ of the time. The model scores from absence of evidence, creating a systematic bias against companies it simply can't find.<br/><br/>
+      <strong>Solution:</strong> Run a pre-enrichment pass before the LLM agents. Pull deterministic data from authoritative public sources, write it to Supabase, and inject pre-populated facts into every agent prompt. The agents confirm and interpret — they no longer need to discover.
+    </div>
+
+    <div class="pipeline">
+      <div class="pipe-step">
+        <span class="num">0</span>
+        Raw domains<br/>from Supabase
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step green">
+        <span class="num">1</span>
+        Pre-enrichment<br/>(free APIs)
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step blue">
+        <span class="num">2</span>
+        Stage A<br/>Holistic agent
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step gold">
+        <span class="num">3</span>
+        Stage B<br/>Categorical agents
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <span class="num">4</span>
+        Write to<br/>Supabase
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- TARGET VERTICALS                                         -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-dot" style="background:#0f2744"></div>
+      <h2>Target Verticals &amp; ICP Definition</h2>
+      <span class="section-meta">Who we are enriching data for</span>
+    </div>
+
+    <div class="verticals-grid">
+
+      <!-- Biotech -->
+      <div class="vertical-card">
+        <div class="vertical-card-header vc-biotech">
+          <span style="font-size:20px">🧬</span>
+          Series A+ Biotech
+          <span class="ph-badge ph1" style="margin-left:auto">Primary</span>
+        </div>
+        <div class="vertical-card-body">
+          <ul>
+            <li>Active small molecule drug discovery pipeline</li>
+            <li>10–150 employees, Series A through Series C</li>
+            <li>In-house medicinal chemistry team (3+ chemists)</li>
+            <li>Preclinical through Phase II stage</li>
+            <li>Examples: Series A oncology biotech, CNS startups</li>
+          </ul>
+          <div style="margin-top:10px; font-size:12px; color:#888">
+            <strong>Why high value:</strong> Actively buying building blocks, high session volume per researcher, strong need for eMolecules services
+          </div>
+        </div>
+      </div>
+
+      <!-- Mid-tier Pharma -->
+      <div class="vertical-card">
+        <div class="vertical-card-header vc-pharma">
+          <span style="font-size:20px">🏭</span>
+          Mid-Tier Pharma
+          <span class="ph-badge ph1" style="margin-left:auto">Primary</span>
+        </div>
+        <div class="vertical-card-body">
+          <ul>
+            <li>500–5,000 employees</li>
+            <li>Established drug discovery organization</li>
+            <li>Multiple active programs across therapeutic areas</li>
+            <li>Mix of small molecule and biologic pipelines</li>
+            <li>Examples: regional pharma, specialty pharma companies</li>
+          </ul>
+          <div style="margin-top:10px; font-size:12px; color:#888">
+            <strong>Why high value:</strong> Large compound orders, procurement through defined channels, multi-year relationships
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Drug Discovery -->
+      <div class="vertical-card">
+        <div class="vertical-card-header vc-ai">
+          <span style="font-size:20px">🤖</span>
+          AI / Computational Drug Discovery
+          <span class="ph-badge ph1" style="margin-left:auto">Primary</span>
+        </div>
+        <div class="vertical-card-body">
+          <ul>
+            <li>AI-first drug discovery platforms</li>
+            <li>Strong CADD / virtual screening capabilities</li>
+            <li>Need for make-on-demand virtual libraries</li>
+            <li>Often Series A–B, 20–100 employees</li>
+            <li>Examples: Recursion, Insilico, Exscientia-type companies</li>
+          </ul>
+          <div style="margin-top:10px; font-size:12px; color:#888">
+            <strong>Why high value:</strong> Virtual Libraries product fit is exact match; high volume, high frequency orders
+          </div>
+        </div>
+      </div>
+
+      <!-- CRO/CDMO -->
+      <div class="vertical-card">
+        <div class="vertical-card-header vc-cro">
+          <span style="font-size:20px">🔬</span>
+          CRO / CDMO (with discovery services)
+          <span class="ph-badge ph2" style="margin-left:auto">Secondary</span>
+        </div>
+        <div class="vertical-card-body">
+          <ul>
+            <li>Contract research orgs with medicinal chemistry capacity</li>
+            <li>Discovery chemistry and SAR services</li>
+            <li>NOT clinical-only CROs (auto-disqualified)</li>
+            <li>Active synthesis and HTS capabilities</li>
+            <li>Examples: Evotec (chemistry division), WuXi AppTec discovery</li>
+          </ul>
+          <div style="margin-top:10px; font-size:12px; color:#888">
+            <strong>Why secondary:</strong> Buy in bulk but price-sensitive; good for Screening Compounds and Building Blocks
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Disqualifiers -->
+    <div class="dq-card">
+      <strong>Automatic Disqualifiers — these verticals are excluded regardless of other signals:</strong>
+      <div class="dq-grid">
+        <div class="dq-item">Pure biologics (antibody / gene therapy / cell therapy / mRNA only)</div>
+        <div class="dq-item">Medical device companies</div>
+        <div class="dq-item">Diagnostics-only companies</div>
+        <div class="dq-item">Manufacturing-only (no discovery division)</div>
+        <div class="dq-item">Clinical-trials-only CROs</div>
+        <div class="dq-item">Academic institutions without industry partnerships</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SCORING DIMENSIONS OVERVIEW                              -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-dot" style="background:#0f2744"></div>
+      <h2>Scoring Dimensions — Current vs. Recommended Weights</h2>
+      <span class="section-meta">Based on fill rate analysis</span>
+    </div>
+
+    <table class="weight-table">
+      <thead>
+        <tr>
+          <th style="width:200px">Dimension</th>
+          <th>Sub-categories scored</th>
+          <th style="width:100px">Current pts</th>
+          <th style="width:100px">Avg fill rate</th>
+          <th style="width:140px">Recommended</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:#1565c0">Stage Fit</strong></td>
+          <td style="font-size:12px; color:#555">
+            Company type (pharma/biotech/CRO) &bull; Employee headcount &bull; Funding stage &bull; Public status
+          </td>
+          <td><strong>30 pts</strong></td>
+          <td>
+            <span class="fill-badge fill-strong">72%</span>
+            <div class="progress-bar"><div class="progress-fill" style="width:72%; background:#1565c0"></div></div>
+          </td>
+          <td style="color:#1a7a4a; font-weight:700">Maintain — reliable</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#1a7a4a">Small Molecule</strong></td>
+          <td style="font-size:12px; color:#555">
+            Active med chem program &bull; CADD / computational chem &bull; Hit-to-lead / lead optimization &bull; Virtual screening / docking
+          </td>
+          <td><strong>30 pts</strong></td>
+          <td>
+            <span class="fill-badge fill-blind">15%</span> Stage A<br/>
+            <span class="fill-badge fill-strong">70%</span> Stage B
+            <div class="progress-bar"><div class="progress-fill" style="width:15%; background:#b03020"></div></div>
+          </td>
+          <td style="color:#c17200; font-weight:700">Maintain in Stage B; reduce Stage A weight</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#6a1b9a">Contact Quality</strong></td>
+          <td style="font-size:12px; color:#555">
+            Highest-seniority chemistry role found &bull; Evidence of internal chemistry team &bull; Estimated team size
+          </td>
+          <td><strong>25 pts</strong></td>
+          <td>
+            <span class="fill-badge fill-blind">21%</span>
+            <div class="progress-bar"><div class="progress-fill" style="width:21%; background:#6a1b9a"></div></div>
+          </td>
+          <td style="color:#c17200; font-weight:700">Reduce to 15 pts until Phase 2 data available</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#c17200">Strategic Intel</strong></td>
+          <td style="font-size:12px; color:#555">
+            Recent funding event &bull; Funding amount &bull; Recent chemistry hires &bull; Drug discovery publications &bull; Pharma partnerships &bull; Patent filings
+          </td>
+          <td><strong>15 pts</strong></td>
+          <td>
+            <span class="fill-badge fill-blind">12%</span>
+            <div class="progress-bar"><div class="progress-fill" style="width:12%; background:#b03020"></div></div>
+          </td>
+          <td style="color:#b03020; font-weight:700">Reduce to 5 pts; gate on 2+ confirmed signals</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- MASTER ROADMAP TABLE                                     -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-dot" style="background:#0f2744"></div>
+      <h2>3-Phase Enrichment Roadmap</h2>
+      <span class="section-meta">All fields, all phases, all sources</span>
+    </div>
+
+    <table class="roadmap-table">
+      <thead>
+        <tr>
+          <th>Phase</th>
+          <th>Dimension</th>
+          <th>Field</th>
+          <th>Current Fill</th>
+          <th>Source</th>
+          <th>Cost</th>
+          <th>Target Fill</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Phase 1 — Stage Fit -->
+        <tr class="ph1">
+          <td><span class="ph-badge ph1">Phase 1</span></td>
+          <td><strong style="color:#1565c0">Stage Fit</strong></td>
+          <td><span style="font-family:monospace;font-size:12px">sf_is_public</span></td>
+          <td><span class="fill-badge fill-blind">14%</span></td>
+          <td>SEC EDGAR company_tickers_exchange.json</td>
+          <td>Free</td>
+          <td><span class="fill-badge fill-strong">~100%</span></td>
+        </tr>
+        <tr class="ph1">
+          <td><span class="ph-badge ph1">Phase 1</span></td>
+          <td><strong style="color:#1565c0">Stage Fit</strong></td>
+          <td><span style="font-family:monospace;font-size:12px">sf_funding_stage</span></td>
+          <td><span class="fill-badge fill-mod">60%</span></td>
+          <td>SEC EDGAR submissions API (filer category)</td>
+          <td>Free</td>
+          <td><span class="fill-badge fill-strong">~90%</span></td>
+        </tr>
+        <tr class="ph1">
+          <td><span class="ph-badge ph1">Phase 1</span></td>
+          <td><strong style="color:#1565c0">Stage Fit</strong></td>
+          <td><span style="font-family:monospace;font-size:12px">sf_employee_range</span></td>
+          <td><span class="fill-badge fill-mod">48%</span></td>
+          <td>SEC EDGAR 10-K filings (public cos only)</td>
+          <td>Free</td>
+          <td><span class="fill-badge fill-mod">~70%</span></td>
+        </tr>
+        <!-- Phase 1 — Strategic Intel -->
+        <tr class="ph1">
+          <td><span class="ph-badge ph1">Phase 1</span></td>
+          <td><strong style="color:#c17200">Strategic Intel</strong></td>
+          <td><span style="font-family:monospace;font-size:12px">si_recent_publications</span></td>
+          <td><span class="fill-badge fill-blind">6%</span></td>
+          <td>PubMed E-utilities — affiliation + keyword search</td>
+          <td>Free</td>
+          <td><span class="fill-badge fill-strong">~85%</span></td>
+        </tr>
+        <tr class="ph1">
+          <td><span class="ph-badge ph1">Phase 1</span></td>
+          <td><strong style="color:#c17200">Strategic Intel</strong></td>
+          <td><span style="font-family:monospace;font-size:12px">si_patent_filings</span></td>
+          <td><span class="fill-badge fill-blind">2%</span></td>
+          <td>PatentsView API — assignee org search (last 3yr)</td>
+          <td>Free</td>
+          <td><span class="fill-badge fill-strong">~80%</span></td>
+        </tr>
+        <tr class="ph1">
+          <td><span class="ph-badge ph1">Phase 1</span></td>
+          <td><strong style="color:#c17200">Strategic Intel</strong></td>
+          <td><span style="font-family:monospace;font-size:12px">si_recent_funding</span></td>
+          <td><span class="fill-badge fill-blind">8%</span></td>
+          <td>SEC EDGAR S-1/S-3/424B filing types (public cos)</td>
+          <td>Free</td>
+          <td><span class="fill-badge fill-mod">~60%</span></td>
+        </tr>
+        <tr class="ph1">
+          <td><span class="ph-badge ph1">Phase 1</span></td>
+          <td><strong style="color:#c17200">Strategic Intel</strong></td>
+          <td><span style="font-family:monospace;font-size:12px">si_funding_amount</span></td>
+          <td><span class="fill-badge fill-blind">10%</span></td>
+          <td>SEC EDGAR 424B4 prospectus text parse (public cos)</td>
+          <td>Free</td>
+          <td><span class="fill-badge fill-mod">~55%</span></td>
+        </tr>
+        <!-- Phase 1 — Small Molecule -->
+        <tr class="ph1">
+          <td><span class="ph-badge ph1">Phase 1</span></td>
+          <td><strong style="color:#1a7a4a">Small Molecule</strong></td>
+          <td><span style="font-family:monospace;font-size:12px">sm_active_med_chem</span></td>
+          <td><span class="fill-badge fill-blind">8%</span></td>
+          <td>ChEMBL (approved drugs) + ClinicalTrials.gov (sponsor)</td>
+          <td>Free</td>
+          <td><span class="fill-badge fill-strong">~75%</span></td>
+        </tr>
+        <tr class="ph1">
+          <td><span class="ph-badge ph1">Phase 1</span></td>
+          <td><strong style="color:#1a7a4a">Small Molecule</strong></td>
+          <td><span style="font-family:monospace;font-size:12px">sm_cadd_capabilities</span></td>
+          <td><span class="fill-badge fill-blind">4%</span></td>
+          <td>PubMed — CADD/computational chemistry keywords + org</td>
+          <td>Free</td>
+          <td><span class="fill-badge fill-mod">~65%</span></td>
+        </tr>
+        <tr class="ph1">
+          <td><span class="ph-badge ph1">Phase 1</span></td>
+          <td><strong style="color:#1a7a4a">Small Molecule</strong></td>
+          <td><span style="font-family:monospace;font-size:12px">sm_hit_to_lead</span></td>
+          <td><span class="fill-badge fill-blind">10%</span></td>
+          <td>ClinicalTrials.gov — Phase 1/2 active trials by sponsor</td>
+          <td>Free</td>
+          <td><span class="fill-badge fill-mod">~65%</span></td>
+        </tr>
+        <tr class="ph1">
+          <td><span class="ph-badge ph1">Phase 1</span></td>
+          <td><strong style="color:#1a7a4a">Small Molecule</strong></td>
+          <td><span style="font-family:monospace;font-size:12px">sm_virtual_screening</span></td>
+          <td><span class="fill-badge fill-blind">0%</span></td>
+          <td>PubMed — virtual screening / molecular docking keywords</td>
+          <td>Free</td>
+          <td><span class="fill-badge fill-mod">~60%</span></td>
+        </tr>
+
+        <!-- Phase 2 — Contact Quality -->
+        <tr class="ph2">
+          <td><span class="ph-badge ph2">Phase 2</span></td>
+          <td><strong style="color:#6a1b9a">Contact Quality</strong></td>
+          <td><span style="font-family:monospace;font-size:12px">cq_highest_role</span></td>
+          <td><span class="fill-badge fill-blind">8%</span></td>
+          <td>Apollo.io — contact search by domain + chemistry titles</td>
+          <td>$49/mo</td>
+          <td><span class="fill-badge fill-strong">~80%</span></td>
+        </tr>
+        <tr class="ph2">
+          <td><span class="ph-badge ph2">Phase 2</span></td>
+          <td><strong style="color:#6a1b9a">Contact Quality</strong></td>
+          <td><span style="font-family:monospace;font-size:12px">cq_has_chemistry_team</span></td>
+          <td><span class="fill-badge fill-blind">14%</span></td>
+          <td>Apollo.io — count employees with chemistry titles at domain</td>
+          <td>$49/mo</td>
+          <td><span class="fill-badge fill-strong">~80%</span></td>
+        </tr>
+        <tr class="ph2">
+          <td><span class="ph-badge ph2">Phase 2</span></td>
+          <td><strong style="color:#6a1b9a">Contact Quality</strong></td>
+          <td><span style="font-family:monospace;font-size:12px">cq_team_size_estimate</span></td>
+          <td><span class="fill-badge fill-blind">4%</span></td>
+          <td>Apollo.io — chemistry-titled employee count by domain</td>
+          <td>$49/mo</td>
+          <td><span class="fill-badge fill-strong">~75%</span></td>
+        </tr>
+
+        <!-- Phase 3 — Private company funding -->
+        <tr class="ph3">
+          <td><span class="ph-badge ph3">Phase 3</span></td>
+          <td><strong style="color:#c17200">Strategic Intel</strong></td>
+          <td><span style="font-family:monospace;font-size:12px">si_recent_funding</span><br/><span style="font-size:11px;color:#888">(private cos)</span></td>
+          <td><span class="fill-badge fill-blind">8%</span></td>
+          <td>Crunchbase Basic API — funding rounds by org</td>
+          <td>$29/mo</td>
+          <td><span class="fill-badge fill-strong">~90%</span></td>
+        </tr>
+        <tr class="ph3">
+          <td><span class="ph-badge ph3">Phase 3</span></td>
+          <td><strong style="color:#c17200">Strategic Intel</strong></td>
+          <td><span style="font-family:monospace;font-size:12px">si_funding_amount</span><br/><span style="font-size:11px;color:#888">(private cos)</span></td>
+          <td><span class="fill-badge fill-blind">10%</span></td>
+          <td>Crunchbase Basic API — round amounts by org</td>
+          <td>$29/mo</td>
+          <td><span class="fill-badge fill-strong">~85%</span></td>
+        </tr>
+        <tr class="ph3">
+          <td><span class="ph-badge ph3">Phase 3</span></td>
+          <td><strong style="color:#1565c0">Stage Fit</strong></td>
+          <td><span style="font-family:monospace;font-size:12px">sf_employee_range</span><br/><span style="font-size:11px;color:#888">(private cos)</span></td>
+          <td><span class="fill-badge fill-mod">48%</span></td>
+          <td>Crunchbase Basic API — headcount for private companies</td>
+          <td>$29/mo</td>
+          <td><span class="fill-badge fill-strong">~95%</span></td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- PHASE 1 — FREE APIs (DETAILED)                          -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-dot cat-sf"></div>
+      <h2>Phase 1 — Free APIs (In Progress)</h2>
+      <span class="section-meta">11 fields &bull; $0/mo &bull; Script: pre_enrichment.py</span>
+    </div>
+
+    <div class="phase-banner phase-1">
+      <div class="phase-num">1</div>
+      <div>
+        <div class="phase-title">Free Data Sources</div>
+        <div class="phase-sub">SEC EDGAR &bull; PubMed &bull; PatentsView &bull; ChEMBL &bull; ClinicalTrials.gov</div>
+      </div>
+      <div style="margin-left:auto; text-align:right">
+        <div class="phase-cost">$0</div>
+        <div class="phase-cost-label">per month</div>
+      </div>
+    </div>
+
+    <!-- Stage Fit -->
+    <div style="font-weight:700; font-size:13px; color:#1565c0; margin-bottom:12px; text-transform:uppercase; letter-spacing:1px">Stage Fit — SEC EDGAR</div>
+    <table class="field-table" style="margin-bottom:24px">
+      <thead><tr><th style="width:200px">Field</th><th style="width:80px">Current</th><th>Source &amp; Query</th><th style="width:150px">Expected Output</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="field-name">sf_is_public</div><div class="field-desc">Publicly traded status</div></td>
+          <td><span class="fill-badge fill-blind">14% BLIND</span></td>
+          <td>
+            <span class="source-pill">SEC EDGAR</span>
+            <div class="api-block"><span class="comment"># Download once, cache in memory</span>
+<span class="url">GET https://www.sec.gov/files/company_tickers_exchange.json</span>
+<span class="comment"># Fields: cik, name, ticker, exchange
+# Fuzzy-match domain → company name → EDGAR title
+# Match found = publicly traded</span></div>
+            <div class="meta-row"><span class="meta-tag tag-free">Free</span><span class="meta-tag tag-rate">10 req/sec</span><span class="meta-tag tag-auth">User-Agent header required</span></div>
+          </td>
+          <td><div class="expected"><strong>true/false</strong><br/>ticker: "GILD"<br/>exchange: "NASDAQ"</div></td>
+        </tr>
+        <tr>
+          <td><div class="field-name">sf_funding_stage</div><div class="field-desc">Public company filer category</div></td>
+          <td><span class="fill-badge fill-mod">60% MOD</span></td>
+          <td>
+            <span class="source-pill">SEC EDGAR Submissions</span>
+            <div class="api-block"><span class="url">GET https://data.sec.gov/submissions/CIK{PADDED_CIK}.json</span>
+<span class="comment"># Parse "category" field:
+# "Large accelerated filer" → Public Large Cap
+# "Accelerated filer"       → Public Mid Cap
+# "Non-accelerated filer"   → Public Small Cap
+# No record → private (Phase 3 handles via Crunchbase)</span></div>
+            <div class="meta-row"><span class="meta-tag tag-free">Free</span><span class="meta-tag tag-rate">10 req/sec</span></div>
+          </td>
+          <td><div class="expected"><strong>"Public — Large Cap"</strong><br/>or null for private</div></td>
+        </tr>
+        <tr>
+          <td><div class="field-name">sf_employee_range</div><div class="field-desc">Headcount (public cos only in Phase 1)</div></td>
+          <td><span class="fill-badge fill-mod">48% MOD</span></td>
+          <td>
+            <span class="source-pill">SEC EDGAR 10-K</span>
+            <div class="api-block"><span class="comment"># From submissions JSON, find most recent 10-K
+# Parse filing for employee count disclosure
+# Typically: "As of [date] we had ~X,XXX full-time employees"</span></div>
+            <div class="meta-row"><span class="meta-tag tag-free">Free</span><span class="meta-tag tag-rate">10 req/sec</span></div>
+          </td>
+          <td><div class="expected"><strong>"~17,000"</strong><br/>from 10-K for public;<br/>null for private</div></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Strategic Intelligence -->
+    <div style="font-weight:700; font-size:13px; color:#c17200; margin-bottom:12px; text-transform:uppercase; letter-spacing:1px">Strategic Intelligence — PubMed + PatentsView + EDGAR</div>
+    <table class="field-table" style="margin-bottom:24px">
+      <thead><tr><th style="width:200px">Field</th><th style="width:80px">Current</th><th>Source &amp; Query</th><th style="width:150px">Expected Output</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="field-name">si_recent_publications</div><div class="field-desc">Drug discovery papers (2022–2026)</div></td>
+          <td><span class="fill-badge fill-blind">6% BLIND</span></td>
+          <td>
+            <span class="source-pill">PubMed E-utilities</span>
+            <div class="api-block"><span class="url">GET https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi</span>
+  <span class="param">?db</span>=<span class="val">pubmed</span>
+  <span class="param">&term</span>=<span class="val">"Gilead Sciences"[ad]</span>
+<span class="val">         AND ("drug discovery"[tiab] OR</span>
+<span class="val">              "medicinal chemistry"[tiab] OR</span>
+<span class="val">              "small molecule"[tiab])</span>
+<span class="val">         AND 2022:2026[dp]</span>
+  <span class="param">&retmode</span>=<span class="val">json&retmax=0</span></div>
+            <div class="meta-row"><span class="meta-tag tag-free">Free</span><span class="meta-tag tag-rate">3 req/sec (10 with API key)</span></div>
+          </td>
+          <td><div class="expected"><strong>count: 47</strong><br/>true/false + paper count</div></td>
+        </tr>
+        <tr>
+          <td><div class="field-name">si_patent_filings</div><div class="field-desc">Patents filed (last 3 years)</div></td>
+          <td><span class="fill-badge fill-blind">2% BLIND</span></td>
+          <td>
+            <span class="source-pill">PatentsView API</span>
+            <div class="api-block"><span class="url">POST https://api.patentsview.org/patents/query</span>
+{
+  <span class="param">"q"</span>: { <span class="param">"_and"</span>: [
+    { <span class="param">"_contains"</span>: { <span class="param">"assignee_organization"</span>: <span class="val">"Gilead"</span> } },
+    { <span class="param">"_gte"</span>: { <span class="param">"patent_date"</span>: <span class="val">"2022-01-01"</span> } }
+  ]},
+  <span class="param">"f"</span>: [<span class="val">"patent_number"</span>, <span class="val">"patent_date"</span>, <span class="val">"patent_title"</span>]
+}</div>
+            <div class="meta-row"><span class="meta-tag tag-free">Free</span><span class="meta-tag tag-rate">45 req/min</span></div>
+          </td>
+          <td><div class="expected"><strong>count: 34</strong><br/>+ most recent title + date</div></td>
+        </tr>
+        <tr>
+          <td><div class="field-name">si_recent_funding</div><div class="field-desc">Capital raise via SEC filing (public only)</div></td>
+          <td><span class="fill-badge fill-blind">8% BLIND</span></td>
+          <td>
+            <span class="source-pill">SEC EDGAR Filings</span>
+            <div class="api-block"><span class="comment"># From submissions JSON, scan recent filings for:
+# S-1, S-3, 424B3, 424B4 → confirmed capital raise
+# Check filingDate within last 18 months</span></div>
+            <div class="meta-row"><span class="meta-tag tag-free">Free</span><span class="meta-tag tag-rate">10 req/sec</span></div>
+          </td>
+          <td><div class="expected"><strong>true/false</strong><br/>form: "424B4"<br/>date: "2024-09-12"</div></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Small Molecule -->
+    <div style="font-weight:700; font-size:13px; color:#1a7a4a; margin-bottom:12px; text-transform:uppercase; letter-spacing:1px">Small Molecule — ChEMBL + ClinicalTrials + PubMed</div>
+    <table class="field-table">
+      <thead><tr><th style="width:200px">Field</th><th style="width:80px">Current</th><th>Source &amp; Query</th><th style="width:150px">Expected Output</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="field-name">sm_active_med_chem</div><div class="field-desc">Active medicinal chemistry program</div></td>
+          <td><span class="fill-badge fill-blind">8% BLIND</span></td>
+          <td>
+            <span class="source-pill">ChEMBL</span><span class="source-pill">ClinicalTrials.gov</span>
+            <div class="api-block"><span class="comment"># ChEMBL — approved drugs by applicant</span>
+<span class="url">GET https://www.ebi.ac.uk/chembl/api/data/drug</span>
+  <span class="param">?applicants__icontains</span>=<span class="val">Gilead&format=json</span>
+
+<span class="comment"># ClinicalTrials — interventional trials by sponsor</span>
+<span class="url">GET https://clinicaltrials.gov/api/v2/studies</span>
+  <span class="param">?query.term</span>=<span class="val">Gilead+Sciences</span>
+  <span class="param">&query.type</span>=<span class="val">Interventional&pageSize=5</span></div>
+            <div class="meta-row"><span class="meta-tag tag-free">Free</span><span class="meta-tag tag-rate">1 req/sec (ChEMBL) / 10 req/sec (CT)</span></div>
+          </td>
+          <td><div class="expected"><strong>true</strong><br/>23 ChEMBL drugs;<br/>12 active trials</div></td>
+        </tr>
+        <tr>
+          <td><div class="field-name">sm_cadd_capabilities</div><div class="field-desc">Computational chemistry / CADD</div></td>
+          <td><span class="fill-badge fill-blind">4% BLIND</span></td>
+          <td>
+            <span class="source-pill">PubMed E-utilities</span>
+            <div class="api-block"><span class="param">&term</span>=<span class="val">"Gilead Sciences"[ad]</span>
+<span class="val">     AND ("CADD"[tiab] OR "computational chemistry"[tiab]</span>
+<span class="val">          OR "molecular docking"[tiab]</span>
+<span class="val">          OR "in silico"[tiab])</span>
+<span class="val">     AND 2022:2026[dp]</span></div>
+            <div class="meta-row"><span class="meta-tag tag-free">Free</span><span class="meta-tag tag-rate">3 req/sec</span></div>
+          </td>
+          <td><div class="expected"><strong>true/false</strong><br/>+ CADD paper count</div></td>
+        </tr>
+        <tr>
+          <td><div class="field-name">sm_hit_to_lead</div><div class="field-desc">Hit-to-lead / lead optimization</div></td>
+          <td><span class="fill-badge fill-blind">10% BLIND</span></td>
+          <td>
+            <span class="source-pill">ClinicalTrials.gov</span>
+            <div class="api-block"><span class="url">GET https://clinicaltrials.gov/api/v2/studies</span>
+  <span class="param">?query.term</span>=<span class="val">Gilead+Sciences</span>
+  <span class="param">&filter.phase</span>=<span class="val">PHASE1,PHASE2</span>
+  <span class="param">&filter.overallStatus</span>=<span class="val">RECRUITING,ACTIVE_NOT_RECRUITING</span></div>
+            <div class="meta-row"><span class="meta-tag tag-free">Free</span><span class="meta-tag tag-rate">10 req/sec</span></div>
+          </td>
+          <td><div class="expected"><strong>true/false</strong><br/>Phase 1/2 count: 8<br/>+ most recent title</div></td>
+        </tr>
+        <tr>
+          <td><div class="field-name">sm_virtual_screening</div><div class="field-desc">Virtual screening / docking (0% fill)</div></td>
+          <td><span class="fill-badge fill-blind">0% BLIND</span></td>
+          <td>
+            <span class="source-pill">PubMed E-utilities</span>
+            <div class="api-block"><span class="param">&term</span>=<span class="val">"Gilead Sciences"[ad]</span>
+<span class="val">     AND ("virtual screening"[tiab]</span>
+<span class="val">          OR "molecular docking"[tiab]</span>
+<span class="val">          OR "in silico screening"[tiab])</span>
+<span class="val">     AND 2022:2026[dp]</span></div>
+            <div class="meta-row"><span class="meta-tag tag-free">Free</span><span class="meta-tag tag-rate">3 req/sec</span></div>
+          </td>
+          <td><div class="expected"><strong>true/false</strong><br/>+ VS paper count</div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- PHASE 2 — APOLLO.IO                                     -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-dot cat-cq"></div>
+      <h2>Phase 2 — Contact Quality (Apollo.io)</h2>
+      <span class="section-meta">3 fields &bull; $49/mo</span>
+    </div>
+
+    <div class="phase-banner phase-2">
+      <div class="phase-num">2</div>
+      <div>
+        <div class="phase-title">Apollo.io Contact Intelligence</div>
+        <div class="phase-sub">Named contacts, chemistry titles, team size — per company domain</div>
+      </div>
+      <div style="margin-left:auto; text-align:right">
+        <div class="phase-cost">$49</div>
+        <div class="phase-cost-label">per month</div>
+      </div>
+    </div>
+
+    <div class="about-box" style="background:#fdf4ff; border-left:4px solid #6a1b9a">
+      Contact Quality is currently scored entirely from inference — the pipeline guesses based on job postings and LinkedIn presence, not verified contacts. Apollo.io's API allows a direct lookup by company domain and job title keyword, returning named people and seniority level. This takes all three Contact Quality fields from ~10% fill to ~80%.
+    </div>
+
+    <table class="field-table">
+      <thead><tr><th style="width:200px">Field</th><th style="width:80px">Current</th><th>Source &amp; Query</th><th style="width:150px">Expected Output</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="field-name">cq_highest_role</div><div class="field-desc">Highest-seniority chemistry decision-maker</div></td>
+          <td><span class="fill-badge fill-blind">8% BLIND</span></td>
+          <td>
+            <span class="source-pill">Apollo.io People API</span>
+            <div class="api-block"><span class="url">POST https://api.apollo.io/api/v1/mixed_people/search</span>
+{
+  <span class="param">"q_organization_domains"</span>: [<span class="val">"gilead.com"</span>],
+  <span class="param">"person_titles"</span>: [
+    <span class="val">"Head of Medicinal Chemistry"</span>,
+    <span class="val">"Director of Chemistry"</span>,
+    <span class="val">"VP Drug Discovery"</span>,
+    <span class="val">"Principal Medicinal Chemist"</span>
+  ],
+  <span class="param">"per_page"</span>: 5
+}</div>
+            <div class="meta-row"><span class="meta-tag tag-paid">$49/mo</span><span class="meta-tag tag-auth">API key required</span></div>
+          </td>
+          <td><div class="expected"><strong>"Dr. Jane Smith"</strong><br/>Director of Med Chem<br/>→ 25 pts confirmed</div></td>
+        </tr>
+        <tr>
+          <td><div class="field-name">cq_has_chemistry_team</div><div class="field-desc">Evidence of internal chemistry team</div></td>
+          <td><span class="fill-badge fill-blind">14% BLIND</span></td>
+          <td>
+            <span class="source-pill">Apollo.io People API</span>
+            <div class="api-block"><span class="comment"># Same search, broader title keywords</span>
+<span class="param">"person_titles"</span>: [
+  <span class="val">"medicinal chemist"</span>,
+  <span class="val">"computational chemist"</span>,
+  <span class="val">"drug discovery"</span>,
+  <span class="val">"synthetic chemist"</span>
+]
+<span class="comment"># count > 0 → chemistry team confirmed</span></div>
+            <div class="meta-row"><span class="meta-tag tag-paid">$49/mo</span></div>
+          </td>
+          <td><div class="expected"><strong>true</strong><br/>"Found 14 chemists<br/>at gilead.com"</div></td>
+        </tr>
+        <tr>
+          <td><div class="field-name">cq_team_size_estimate</div><div class="field-desc">Size of chemistry organization</div></td>
+          <td><span class="fill-badge fill-blind">4% BLIND</span></td>
+          <td>
+            <span class="source-pill">Apollo.io People API</span>
+            <div class="api-block"><span class="comment"># Count of chemistry-titled employees returned
+# across multiple title keyword searches
+# Combine counts for team size estimate band:
+# 1-5 → "Small team", 6-20 → "Mid team", 20+ → "Large team"</span></div>
+            <div class="meta-row"><span class="meta-tag tag-paid">$49/mo</span></div>
+          </td>
+          <td><div class="expected"><strong>"20–50 chemists"</strong><br/>(estimated from<br/>Apollo count)</div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- PHASE 3 — CRUNCHBASE                                    -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-dot cat-si"></div>
+      <h2>Phase 3 — Private Company Funding (Crunchbase)</h2>
+      <span class="section-meta">3 fields &bull; $29/mo</span>
+    </div>
+
+    <div class="phase-banner phase-3">
+      <div class="phase-num">3</div>
+      <div>
+        <div class="phase-title">Crunchbase Basic API</div>
+        <div class="phase-sub">Funding rounds, headcount, and stage data for private companies — filling the EDGAR gap</div>
+      </div>
+      <div style="margin-left:auto; text-align:right">
+        <div class="phase-cost">$29</div>
+        <div class="phase-cost-label">per month</div>
+      </div>
+    </div>
+
+    <div class="about-box" style="background:#fff8ee; border-left:4px solid #c17200">
+      Phase 1 covers public companies via SEC EDGAR. The remaining gap is <strong>private biotechs</strong> — which represent most of the high-value ICP targets (Series A–C). Crunchbase has structured funding round data, headcount ranges, and investor lists for private companies. At $29/mo Basic tier, this fills the most important Strategic Intelligence and Stage Fit gaps for private prospects.
+    </div>
+
+    <table class="field-table">
+      <thead><tr><th style="width:200px">Field</th><th style="width:80px">Current</th><th>Source &amp; Query</th><th style="width:150px">Expected Output</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="field-name">si_recent_funding</div><div class="field-desc">Recent funding round (private cos)</div></td>
+          <td><span class="fill-badge fill-blind">8% BLIND</span></td>
+          <td>
+            <span class="source-pill">Crunchbase Basic API</span>
+            <div class="api-block"><span class="url">GET https://api.crunchbase.com/api/v4/entities/organizations/{permalink}</span>
+  <span class="param">?field_ids</span>=<span class="val">funding_rounds,last_funding_type,last_funding_at</span>
+  <span class="param">&user_key</span>=<span class="val">{API_KEY}</span>
+
+<span class="comment"># last_funding_at within 18 months = recent funding</span></div>
+            <div class="meta-row"><span class="meta-tag tag-paid">$29/mo</span><span class="meta-tag tag-auth">API key required</span></div>
+          </td>
+          <td><div class="expected"><strong>true</strong><br/>round: "Series B"<br/>date: "2024-11-15"</div></td>
+        </tr>
+        <tr>
+          <td><div class="field-name">si_funding_amount</div><div class="field-desc">Specific round amount (private cos)</div></td>
+          <td><span class="fill-badge fill-blind">10% BLIND</span></td>
+          <td>
+            <span class="source-pill">Crunchbase Basic API</span>
+            <div class="api-block"><span class="param">?field_ids</span>=<span class="val">last_funding_total,funding_total</span>
+<span class="comment"># last_funding_total = amount raised in most recent round
+# funding_total = cumulative raised to date</span></div>
+            <div class="meta-row"><span class="meta-tag tag-paid">$29/mo</span></div>
+          </td>
+          <td><div class="expected"><strong>"$45M"</strong><br/>Series B,<br/>Nov 2024</div></td>
+        </tr>
+        <tr>
+          <td><div class="field-name">sf_employee_range</div><div class="field-desc">Headcount for private companies</div></td>
+          <td><span class="fill-badge fill-mod">48% MOD</span></td>
+          <td>
+            <span class="source-pill">Crunchbase Basic API</span>
+            <div class="api-block"><span class="param">?field_ids</span>=<span class="val">num_employees_enum</span>
+<span class="comment"># Returns bucket: "1-10", "11-50", "51-100",
+# "101-250", "251-500", "501-1000", "1001-5000", "5001-10000", "10001+"</span></div>
+            <div class="meta-row"><span class="meta-tag tag-paid">$29/mo</span></div>
+          </td>
+          <td><div class="expected"><strong>"51–100"</strong><br/>(Crunchbase bucket)<br/>for private cos</div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- COST SUMMARY                                            -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-dot" style="background:#0f2744"></div>
+      <h2>Total Cost Summary</h2>
+    </div>
+    <div class="cost-summary">
+      <div class="cost-card" style="border-left:4px solid #1a7a4a">
+        <div class="cost-label">Phase 1 — Now (free)</div>
+        <div class="cost-val" style="color:#1a7a4a">$0 / mo</div>
+        <div class="cost-note">SEC EDGAR, PubMed, USPTO PatentsView, ChEMBL, ClinicalTrials.gov<br/>Covers 11 of 17 fields</div>
+      </div>
+      <div class="cost-card" style="border-left:4px solid #6a1b9a">
+        <div class="cost-label">Phase 2 — Contact Quality</div>
+        <div class="cost-val" style="color:#6a1b9a">$49 / mo</div>
+        <div class="cost-note">Apollo.io Basic<br/>Covers cq_* fields (named contacts, team size)</div>
+      </div>
+      <div class="cost-card" style="border-left:4px solid #c17200">
+        <div class="cost-label">Phase 3 — Private Funding</div>
+        <div class="cost-val" style="color:#c17200">$29 / mo</div>
+        <div class="cost-note">Crunchbase Basic API<br/>Covers private company funding + headcount</div>
+      </div>
+    </div>
+    <div style="margin-top:20px; background:#f0f4f9; border-radius:8px; padding:16px 20px; font-size:14px; color:#444; line-height:1.7">
+      <strong style="color:#0f2744">Full rollout cost: $78/mo</strong> — to take 14 BLIND fields to ~80–100% fill rate.
+      Phase 1 alone (free) resolves the most impactful gaps: small molecule signals, publication history, patent activity, and public company data.
+      Phases 2 and 3 add contact intelligence and private company funding — the remaining hard gaps.
+    </div>
+  </div>
+
+  <footer>
+    eMolecules ICP Pre-Enrichment Plan &bull; Generated April 13, 2026 &bull; Confidential
+  </footer>
+
+</div>
+</body>
+</html>
