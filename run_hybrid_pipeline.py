@@ -1249,6 +1249,29 @@ async def main():
     async with aiohttp.ClientSession() as session:
         all_companies = await fetch_all_companies(session, limit=None)
 
+    # Skip companies already scored in icp_hybrid_results
+    print("Checking for already-scored companies...")
+    base_headers = {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}"}
+    already_scored = set()
+    offset = 0
+    async with aiohttp.ClientSession() as session:
+        while True:
+            url = (f"{SUPABASE_URL}/rest/v1/icp_hybrid_results"
+                   f"?select=domain&limit=1000&offset={offset}")
+            async with session.get(url, headers=base_headers) as resp:
+                rows = await resp.json()
+                if not rows:
+                    break
+                for r in rows:
+                    already_scored.add(r["domain"])
+                if len(rows) < 1000:
+                    break
+                offset += 1000
+
+    all_companies = [c for c in all_companies if c["domain"] not in already_scored]
+    print(f"  {len(already_scored)} already scored — skipping")
+    print(f"  {len(all_companies)} remaining to score")
+
     print(f"\nReady to process {len(all_companies)} companies.\n")
 
     # Skip interactive prompt when running non-interactively (e.g. Render)
