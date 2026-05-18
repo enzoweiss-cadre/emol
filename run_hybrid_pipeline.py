@@ -1339,6 +1339,7 @@ async def main():
             "results": all_final
         }, f, indent=2)
     print(f"\nResults saved to Supabase ({TARGET_TABLE}) + {output_path}")
+    sys.exit(0)  # explicit clean exit so Render doesn't restart
 
 
 if __name__ == "__main__":
