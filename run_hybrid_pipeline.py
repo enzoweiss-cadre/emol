@@ -1251,12 +1251,17 @@ async def main():
 
     print(f"\nReady to process {len(all_companies)} companies.\n")
 
-    # Ask user to confirm with a 10-company test run first
-    try:
-        answer = input("Run a test on 10 companies first? [Y/n]: ").strip().lower()
-    except (EOFError, KeyboardInterrupt):
-        print("\nAborted.")
-        return
+    # Skip interactive prompt when running non-interactively (e.g. Render)
+    import sys
+    if not sys.stdin.isatty():
+        print("Non-interactive mode — skipping test, running full pipeline.\n")
+        answer = "n"
+    else:
+        try:
+            answer = input("Run a test on 10 companies first? [Y/n]: ").strip().lower()
+        except (EOFError, KeyboardInterrupt):
+            print("\nAborted.")
+            return
 
     if answer not in ("n", "no"):
         test_companies = all_companies[:10]
