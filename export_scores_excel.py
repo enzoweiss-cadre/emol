@@ -7,7 +7,7 @@ from openpyxl.styles import (
 from openpyxl.utils import get_column_letter
 
 # ── Load data ──────────────────────────────────────────────────────────────────
-with open("results/hybrid_489_rerun_20260422_1511.json") as f:
+with open("results/full_run_may18.json") as f:
     data = json.load(f)
 
 results = data["results"]
@@ -146,6 +146,18 @@ def country_to_tier(country: str) -> str:
         return "India"
     return "Other"
 
+
+# Enforce qualification_status from final_icp_score (override agent text)
+for r in results:
+    score = r.get("final_icp_score") or 0
+    if score >= 80:
+        r["qualification_status"] = "HIGH FIT"
+    elif score >= 60:
+        r["qualification_status"] = "MEDIUM FIT"
+    elif score >= 40:
+        r["qualification_status"] = "LOW FIT"
+    else:
+        r["qualification_status"] = "NO FIT"
 
 # Pre-compute location for all results
 for r in results:
@@ -479,7 +491,7 @@ for ri, tier in enumerate(tier_order, 2):
         c.font = Font(bold=(ci == 1))
 
 # ── Save ───────────────────────────────────────────────────────────────────────
-out = "results/emolecules_scores_may08.xlsx"
+out = "results/emolecules_scores_may18.xlsx"
 wb.save(out)
 print(f"Saved → {out}")
 print(f"  All companies : {len(sorted_results)}")

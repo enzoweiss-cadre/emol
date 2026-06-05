@@ -49,7 +49,7 @@ def get_all(path, params, page_size=1000):
 
 def main():
     # Load our 489 scored domains
-    with open("results/hybrid_489_rerun_20260422_1511.json") as f:
+    with open("results/full_run_may18.json") as f:
         scored = json.load(f)["results"]
     our_domains = {r["domain"].strip() for r in scored}
 

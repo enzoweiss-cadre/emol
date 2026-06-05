@@ -87,7 +87,7 @@ def batch_geolocate(ips: list[str]) -> dict[str, dict]:
 
 def main():
     # Load the 489 scored domains
-    with open("results/hybrid_489_rerun_20260422_1511.json") as f:
+    with open("results/full_run_may18.json") as f:
         scored = json.load(f)["results"]
     all_domains = {r["domain"] for r in scored}
 

@@ -3,7 +3,7 @@ import json, csv, re
 from collections import Counter
 
 # ── Load data ──────────────────────────────────────────────────────────────────
-with open("results/hybrid_489_rerun_20260422_1511.json") as f:
+with open("results/full_run_may18.json") as f:
     data = json.load(f)
 results = data["results"]
 
@@ -99,6 +99,18 @@ def country_to_tier(country):
     return "Other"
 
 # ── Build rows ─────────────────────────────────────────────────────────────────
+# Enforce qualification_status from final_icp_score
+for r in results:
+    score = r.get("final_icp_score") or 0
+    if score >= 80:
+        r["qualification_status"] = "HIGH FIT"
+    elif score >= 60:
+        r["qualification_status"] = "MEDIUM FIT"
+    elif score >= 40:
+        r["qualification_status"] = "LOW FIT"
+    else:
+        r["qualification_status"] = "NO FIT"
+
 sorted_results = sorted(results, key=lambda r: r.get("final_icp_score") or 0, reverse=True)
 
 NEW_FIELDS = ["geo_tier", "country", "city", "loc_source",
@@ -113,7 +125,7 @@ with open("results/emolecules_scores_apr22.csv") as f:
 
 all_fields = existing_fields + NEW_FIELDS
 
-out_path = "results/emolecules_scores_may08.csv"
+out_path = "results/emolecules_scores_may18.csv"
 with open(out_path, "w", newline="") as f:
     writer = csv.DictWriter(f, fieldnames=all_fields, extrasaction="ignore")
     writer.writeheader()

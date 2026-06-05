@@ -153,7 +153,7 @@ async def main():
         base_url="https://openrouter.ai/api/v1",
     )
 
-    with open("results/hybrid_489_rerun_20260422_1511.json") as f:
+    with open("results/full_run_may18.json") as f:
         scored = json.load(f)["results"]
 
     print(f"Running Sonar research-location queries for {len(scored)} companies...")
