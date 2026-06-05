@@ -1,15 +1,24 @@
 """
 Fetch all scored results from Supabase icp_hybrid_results and save locally.
 """
-import json, urllib.request, urllib.parse
+import json, os, urllib.request, urllib.parse
 from datetime import datetime
 
-SUPABASE_URL = "https://vvqwhfzuuvgpzyjzjnoa.supabase.co"
-SUPABASE_KEY = (
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2cXdoZnp1"
-    "dXZncHp5anpqbm9hIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDkwMjcxMCwiZXhwIjoyMDkwNDc4NzEwfQ"
-    ".qU95gMA0xGyIcLDNwms6JU3uGW7X1MPeAFqATXKCdqQ"
-)
+def _load_env():
+    env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+    if os.path.exists(env_path):
+        with open(env_path) as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    k, v = line.split("=", 1)
+                    if v and not os.environ.get(k):
+                        os.environ[k] = v
+
+_load_env()
+
+SUPABASE_URL = os.environ["SUPABASE_URL"]
+SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or os.environ["SUPABASE_KEY"]
 
 def fetch_all(table, select="*", order="total_sessions.desc"):
     rows = []
